@@ -1,0 +1,77 @@
+#wrapper {
+    width: 98%;
+    margin: 2%;
+}
+#page-header-block, #page-footer-block {
+    width: 100%;
+    min-height: 150px;
+    background-color: #009999;
+    float: left;
+}
+#logo {
+    background-color: #003399;
+    float: left;
+    margin: 10px;
+    min-height: 130px;
+    width: 250px;
+}
+#header-right {
+    float: right;
+    padding: 10px;
+}
+
+#page-main-contents {
+    margin: 5px 0px;
+}
+#page-left-block{
+    width: 20%;
+    min-height: 250px;
+    float: left;
+    background-color: #409ad5;
+}
+
+#main-contents-with-3col {
+    float: left;
+    width: 60%;
+}
+#main-contents-with-1col {
+    float: left;
+    width: 100%;
+}
+#main-contents-with-2col {
+    float: left;
+    width: 80%;
+}
+#page-right-block{
+    width: 20%;
+    min-height: 250px;
+    float: right;
+    background-color: #409ad5;
+}
+.error{
+    color: red;
+    margin: 0px 10px;
+}
+#login-block, #sign-up-block {
+    width: 300px;
+    height: 300px ;
+    padding: 20px;
+    margin-left: 25%;
+}
+
+input.error {
+    border: 1px dotted red;
+}
+.input-box {
+    margin: 15px 0;
+    padding: 10px 0;
+}
+.input-box label {
+    float: left;
+}
+.input-box input {
+    float: right;
+}
+.mandatory {
+    color: red;
+}
