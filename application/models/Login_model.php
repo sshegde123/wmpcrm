@@ -22,9 +22,10 @@ class Login_model extends  CI_Model {
      */
     public function authenticateCustomer($userName, $password){
         try{
-            $customer = $this->db->get_where('customers', array('email'=>$userName, 'password' => md5($password)));
-            if($customer->num_rows){
-                $this->setCustomerSession($customer->result_array()[0]);
+            $users = $this->db->select('*')->get_where('users', array('email'=>$userName, 'password' => md5($password)));
+            //echo "<pre>";print_r();exit;
+            if($users->result_array()){
+                $this->setCustomerSession($users->result_array()[0]);
                 return true;
             }
         } catch(Exception $e){
@@ -34,7 +35,7 @@ class Login_model extends  CI_Model {
     }
 
 
-    public function setCustomerSession($customerData){
-        $this->session->set_userdata('customerData',$customerData);
+    public function setCustomerSession($usersData){
+        $this->session->set_userdata('customerData',$usersData);
     }
 } 
