@@ -41,7 +41,20 @@ class Users extends CI_Controller {
         try{
             $data = $this->getCustomer();
             $data['pageTitle'] = "Create New User";
-            loadViewFiles(true,false,'users/edit',$data);
+            loadViewFiles(true,true,'users/edit',$data);
+            //throw new Exception("mm");
+        } catch(Exception $e){
+            loadViewFiles(true,false,'error',$data);
+            log_message("error",$e->getMessage());
+        }
+    }
+
+    /**
+     * Function to save user details
+     */
+    public function save(){
+        try{
+            print_r($this->input->post());
         } catch(Exception $e){
             loadViewFiles(true,false,'error',$data);
             log_message("error",$e->getMessage());
