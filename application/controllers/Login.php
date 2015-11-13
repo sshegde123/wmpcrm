@@ -29,7 +29,7 @@ class Login extends CI_Controller {
             $this->load->helper(array('form', 'url'));
             $this->load->library('form_validation');
 
-            $this->form_validation->set_rules("userName", "Username",'trim|required');
+            $this->form_validation->set_rules("userName", "Username",'trim|required|valid_email');
             $this->form_validation->set_rules("password","Password",'trim|required');
             if(!$this->form_validation->run()){
                 $this->loginViewFiles($data);

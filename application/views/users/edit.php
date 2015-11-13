@@ -11,7 +11,9 @@
 
 
 <div id="main-contents-with-3col">
+    <?php echo validation_errors(); ?>
     <form id="create-user-frm" name="create-user-frm" action="<?php echo site_url('users/save') ?>" method="post" ng-app="signUp" ng-controller="signUpCtrl">
+        <input type="hidden" id="userId" name="userId" value="1">
         <div id="edit-user-blocks" >
             <fieldset>
                 <legend><?php echo $pageTitle ?></legend>
@@ -20,9 +22,6 @@
                         <td>First Name</td>
                         <td>
                             <input type="text" name="first_name" id="first_name" ng-model="firstName" required>
-                            <div class="mandatory" ng-show="signUpFrm.firstName.$dirty && signUpFrm.firstName.$invalid">
-                                <span ng-show="myForm.firstName.$error.required">Enter your first name.</span>
-                            </div>
                         </td>
                     </tr>
                     <tr>
@@ -31,7 +30,10 @@
                     </tr>
                     <tr>
                         <td>Email</td>
-                        <td><input type="text" name="email" id="email" ng-model="email" required></td>
+                        <td>
+                            <input type="text" name="email" id="email" ng-model="email" required>
+                            <div class="error" id="email-errror-msg"></div>
+                        </td>
                     </tr>
                     <tr>
                         <td>Password</td>
@@ -65,7 +67,7 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <input type="submit" value="Create">
+                            <input type="submit" id="create-user-submit-btn" value="Create">
                             <input type="button" value="Cancel">
                         </td>
                     </tr>
@@ -75,10 +77,65 @@
     </form>
 </div>
 
-<script>
-    var app = angular.module("signUp",[]);
-    app.controller('signUpCtrl', function($scope){
+<script type="application/javascript">
+    var isemailValid = 0;
+    $().ready(function(){
+        $("#email").blur(function(){
+            var email = $(this).val();
+            var userId = $("#userId").val();
+            var data = {
+                "email":email,
+                "id" : userId
+            }
+            var errorMsg = "";
+            $("#email-errror-msg").html("");
+            if(!isValidEmailAddress(email) || email ==""){
+                $("#email-errror-msg").html("Invalid email address");
+                return false;
+            }
+            $.ajax({
+                type :"POST",
+                url:baseUrl+"/users/validateUserEmail",
+                data: data,
+                dataType:"JSON",
+                success: function(responseData){
+                    switch(responseData.status){
+                        case 0:
+                            errorMsg = "Invalid email address";
+                            isemailValid = 0;
+                            break;
+                        case 1:
+                            errorMsg = "";
+                            isemailValid = 1;
+                            break;
+                        case 2:
+                            errorMsg = "Email already exists";
+                            isemailValid = 0;
+                            break;
 
+                        default :
+                            errorMsg = "Unable to validate email. Please try again";
+                            isemailValid = 0;
+                            break;
+                    }
+                    $("#email-errror-msg").html(errorMsg);
+                }
+            })
+        });
+
+        $("#create-user-submit-btn").click(function(){
+            if(isemailValid && isValidEmailAddress){
+                $("#create-user-frm").submit();
+            } else {
+                if($("#email-errror-msg").html()==""){
+                    $("#email-errror-msg").html("Invalid email address");
+                }
+            }
+        });
     })
-    alert($("#"))
+
+    function isValidEmailAddress(emailAddress) {
+        var pattern = new RegExp(/^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i);
+        return pattern.test(emailAddress);
+    }
 </script>
