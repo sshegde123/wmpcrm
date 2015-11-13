@@ -23,7 +23,7 @@ class User_model extends CI_Model
         try{
             if($userId){
                 $users = $this->db->select('email')->get_where("users", array("email"=>$email, "id <>" => $userId));
-                //throw new Exception("Test");
+                //print_r($this->db->last_query());
                 if($users->result_array()){
                     return 1;
                 } else {

@@ -17,7 +17,7 @@
         <div id="edit-user-blocks" >
             <fieldset>
                 <legend><?php echo $pageTitle ?></legend>
-                <table border="0" width="500">
+                <table border="0">
                     <tr>
                         <td>First Name</td>
                         <td>
@@ -50,11 +50,11 @@
                     </tr>
                     <tr>
                         <td>Phone</td>
-                        <td><input type="text" name="phone" id="phone" ng-model="phone" required></td>
+                        <td><input type="text" name="phone" id="phone" ng-model="phone"></td>
                     </tr>
                     <tr>
                         <td>Mobile</td>
-                        <td><input type="text" name="mobile" id="mobile" ng-model="mobile" required></td>
+                        <td><input type="text" name="mobile" id="mobile" ng-model="mobile"></td>
                     </tr>
                     <tr>
                         <td>Roles</td>
@@ -90,7 +90,7 @@
             var errorMsg = "";
             $("#email-errror-msg").html("");
             if(!isValidEmailAddress(email) || email ==""){
-                $("#email-errror-msg").html("Invalid email address");
+                //$("#email-errror-msg").html("Invalid email address");
                 return false;
             }
             $.ajax({
@@ -126,13 +126,42 @@
         $("#create-user-submit-btn").click(function(){
             if(isemailValid && isValidEmailAddress){
                 $("#create-user-frm").submit();
-            } else {
-                if($("#email-errror-msg").html()==""){
-                    $("#email-errror-msg").html("Invalid email address");
+            }
+        });
+
+        $( "#create-user-frm" ).validate({
+
+            rules: {
+                password: "required",
+                cnfrm_password: {
+                    equalTo: "#password"
+                },
+                email: {
+                    required: true,
+                    email: true
+                },
+                phone: {
+                    required : function(element){
+                        if($("#mobile").val() ==""){
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                },
+                mobile: {
+                    required: function(element){
+                        if($("#phone").val() ==""){
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
                 }
             }
         });
     })
+
 
     function isValidEmailAddress(emailAddress) {
         var pattern = new RegExp(/^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i);
