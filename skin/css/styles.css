@@ -75,3 +75,8 @@ input.error {
 .mandatory {
     color: red;
 }
+.success-msg{
+    color: #2cc36b;
+    font-weight: bold;
+    padding: 5px;
+}

@@ -15,9 +15,19 @@ class Users extends CI_Controller {
         $this->load->model("user_model");
     }
 
+    /**
+     * User grid view
+     */
+    public function index(){
+        $data['userSession'] = $this->getCustomer();
+        $data['all'] = $this->user_model->getUsersList();
+        $data['pageTitle'] = "All Users";
+        //print_r($data['all']);
+        loadViewFiles(true,false,'users/list',$data);
+    }
     public function dashboard(){
         //print_r($this->getCustomer());
-        $data = $this->getCustomer();
+        $data['userSession'] = $this->getCustomer();
         $data['pageTitle'] = "Dashboard";
         loadViewFiles(true,false,'customer/dashboard',$data);
     }
@@ -40,7 +50,10 @@ class Users extends CI_Controller {
      */
     public function create(){
         try{
-            $data = $this->getCustomer();
+            if($this->input->get('id')){
+                $data = $this->user_model->getUserData($this->input->get('id'));
+            }
+            $data['userSession'] = $this->getCustomer();
             $data['pageTitle'] = "Create New User";
             $this->load->helper('form');
             loadViewFiles(true,true,'users/edit',$data);
@@ -57,26 +70,35 @@ class Users extends CI_Controller {
         try{
             $data = array();
             $postData = $this->input->post();
-            //$this->load->helper(array('form', 'url'));
             $this->load->library('form_validation');
             $this->form_validation->set_rules('first_name','first_name', 'trim|required');
-            /*$this->form_validation->set_rules('last_name','last_name','trim|required|xss_clean');
-            $this->form_validation->set_rules('email','email','trim|required|email|xss_clean');
+            $this->form_validation->set_rules('last_name','last_name','trim|required');
+            $this->form_validation->set_rules('email','email','trim|required|valid_email');
+            $redirectUrl = 'users/create';
+
             if(!$postData['phone'] && !$postData['mobile']){
-                $this->form_validation->set_rules('phone','phone','trim|required|regex_match[/^[0-9]+$/]|xss_clean');
-                $this->form_validation->set_rules('mobile','mobile','trim|required|regex_match[/^[0-9]+$/]|xss_clean');
-            }*/
-            echo $this->form_validation->run();
-            //echo $this->user_model->isEmailAlreadyExists($postData['email'],$postData['userId']);
-            if(!$this->user_model->isEmailAlreadyExists($postData['email'],$postData['userId'])){
-                echo "success";
-            } else {
-                echo "fail";
+                $this->form_validation->set_rules('phone','phone','trim|required|regex_match[/^[0-9]+$/]');
+                $this->form_validation->set_rules('mobile','mobile','trim|required|regex_match[/^[0-9]+$/]');
+            }
+            if($this->form_validation->run() && !$this->user_model->isEmailAlreadyExists($postData['email'],$postData['id'])){
+                $userId = $this->user_model->saveUser($postData);
+                if($userId){
+                    $this->session->set_flashdata('successMsg', 'User Account created successfully.');
+                    $redirectUrl = $redirectUrl."?id=".$userId;
+                    redirect($redirectUrl,'refresh');
+                    return true;
+                }
             }
         } catch(Exception $e){
             loadViewFiles(true,false,'error',$data);
             log_message("error",$e->getMessage());
         }
+        if($postData['id']){
+            $redirectUrl = $redirectUrl.'?id='.$postData['id'];
+        }
+        $this->session->set_flashdata('errorMsg', 'Error while saving user details. Please try again.');
+        redirect($redirectUrl,'refresh');
+        return;
     }
 
     /**
@@ -90,10 +112,13 @@ class Users extends CI_Controller {
             $email = $this->input->post("email");
             $userId = $this->input->post('id');
             //throw new Exception("test");
-            if(filter_var($email, FILTER_VALIDATE_EMAIL) && !$this->user_model->isEmailAlreadyExists($email, $userId)){
+            if(filter_var($email, FILTER_VALIDATE_EMAIL)){
+                $response['status'] = 0;
+            }
+            if(!$this->user_model->isEmailAlreadyExists($email, $userId)){
                 $response['status'] = 1;
             } else {
-                $response['status'] = 0;
+                $response['status'] = 2;
             }
         }catch (Exception $e){
             $response['status']= 500;
